@@ -9,7 +9,6 @@ canvas = pygame.display.set_mode((cnvW, cnvH))
 pygame.display.set_caption("Attraction")
 
 chargeA = []
-slowVal = 2
 
 # Assign FPS a value
 FPS = 30
@@ -17,8 +16,7 @@ FramePerSec = pygame.time.Clock()
 frameCount = 0
 
 #create balls
-negBall = balls(False, cnvW / 2, cnvH / 2, 5)
-posBall = balls(True, cnvW - 300, cnvH / 2, 5)
+centreBall = balls(False, cnvW / 2, cnvH / 2, 5)
 
 #create dummy
 dummy0 = dummy((255, 255, 170), cnvW / 2, cnvH / 2, 2)
@@ -41,39 +39,6 @@ def drawCirc(CircObj):
 def randColour():
     return random.randrange(0, 255), random.randrange(0, 255), random.randrange(0, 255)
 
-def attraction(charge, ball):
-    if charge.dir == "horizontal":
-        if charge.x <= ball.x:
-            charge.x += charge.a + slowVal
-            charge.a += 1
-        if charge.x >= ball.x:
-            charge.x += charge.a - slowVal
-            charge.a -= 1
-    elif charge.dir == "vertical":
-        if charge.y <= ball.y:
-            charge.y += charge.a + slowVal
-            charge.a += 1
-        if charge.y >= ball.y:
-            charge.y += charge.a - slowVal
-            charge.a -= 1
-    elif charge.dir == "neg":
-        if charge.y <= ball.y:
-            charge.y += charge.a + slowVal
-            charge.x += charge.a + slowVal
-            charge.a += 1
-        if charge.y >= ball.y:
-            charge.y += charge.a - slowVal
-            charge.x += charge.a - slowVal
-            charge.a -= 1
-    elif charge.dir == "pos":
-        if charge.y <= ball.y:
-            charge.y += charge.a + slowVal
-            charge.x -= charge.a + slowVal
-            charge.a += 1
-        if charge.y >= ball.y:
-            charge.y += charge.a - slowVal
-            charge.x -= charge.a - slowVal
-            charge.a -= 1
 
 def createCharge():
     if (mouseY > ((cnvH / 2) / cnvW * mouseX) + cnvH / 4 and mouseY < ((cnvH / 2) / cnvW * -(mouseX - cnvW)) + cnvH / 4) or (mouseY < ((cnvH / 2) / cnvW * mouseX) + cnvH / 4 and mouseY > ((cnvH / 2) / cnvW * -(mouseX - cnvW)) + cnvH / 4):
@@ -113,7 +78,7 @@ while running:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             createCharge()
-    
+
     #BG Colour
     canvas.fill((30, 30, 30))
 
@@ -121,27 +86,27 @@ while running:
     drawDummy()
 
     #draw circles
-    drawCirc(negBall)
+    drawCirc(centreBall)
     #drawCirc(posBall)
     for x in range(len(chargeA)):
         if chargeA[x].dir == "horizontal" or chargeA[x].dir == "neg":
             #stop detection
             if frameCount % 0.5 == 0:
-                pos1 = chargeA[x].x - negBall.x
+                pos1 = chargeA[x].x - centreBall.x
             if frameCount % 1 == 0:
-                pos2 = chargeA[x].x - negBall.x
+                pos2 = chargeA[x].x - centreBall.x
                 if pos1 + pos2 >= 5 or pos1 + pos2 <= -5:
                     drawCirc(chargeA[x])
         elif chargeA[x].dir == "vertical" or chargeA[x].dir == "pos":
             #stop detection
             if frameCount % 0.5 == 0:
-                pos1 = chargeA[x].y - negBall.y
+                pos1 = chargeA[x].y - centreBall.y
             if frameCount % 1 == 0:
-                pos2 = chargeA[x].y - negBall.y
+                pos2 = chargeA[x].y - centreBall.y
                 if pos1 + pos2 >= 5 or pos1 + pos2 <= -5:
                     drawCirc(chargeA[x])
         #Attraction
-        attraction(chargeA[x], negBall)
+        chargeA[x].attraction(centreBall)
 
     #Update display
     pygame.display.update()
